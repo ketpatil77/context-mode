@@ -59,6 +59,9 @@ export function stripJsonComments(str: string): string {
  * comment/trailing-comma-stripped parse. Returns `undefined` when both fail.
  */
 export function parseJsonc<T = unknown>(raw: string): T | undefined {
+  // Windows editors may prefix UTF-8 configuration files with a BOM.
+  // Remove only the file marker, preserving any U+FEFF inside string values.
+  if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1);
   for (const candidate of [raw, stripJsonComments(raw)]) {
     try {
       return JSON.parse(candidate) as T;

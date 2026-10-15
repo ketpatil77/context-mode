@@ -5141,6 +5141,13 @@ test("server.ts delegates JSONC stripping to string-aware src/util/jsonc (#787 i
 // literals ("[1, ]" -> "[1 ]", the 386a196 regression). These tests pin the
 // shared util that replaced both.
 describe("parseJsonc / stripJsonComments (src/util/jsonc)", () => {
+  test("accepts a leading UTF-8 BOM in JSON and JSONC configuration", () => {
+    expect(parseJsonc('\uFEFF{"enabled":true}')).toEqual({ enabled: true });
+    expect(parseJsonc('\uFEFF{ // Windows configuration\n "enabled": true, }'))
+      .toEqual({ enabled: true });
+    expect(parseJsonc('{"note":"\uFEFF"}')).toEqual({ note: "\uFEFF" });
+  });
+
   test("preserves // inside string values (URLs) while stripping line comments", () => {
     const jsonc = '{\n  // strip me\n  "url": "https://mcp.context7.com/mcp"\n}';
     expect(parseJsonc<{ url: string }>(jsonc)?.url).toBe("https://mcp.context7.com/mcp");
