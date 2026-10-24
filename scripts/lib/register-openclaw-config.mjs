@@ -28,10 +28,10 @@ export function registerContextModeInOpenclawConfig(runtimePath, pluginRoot) {
   // 1. Remove plugins.load.paths entry (causes duplicate registration)
   const load = plugins.load ?? {};
   const paths = load.paths ?? [];
-  const idx = paths.indexOf(pluginRoot);
-  if (idx !== -1) {
-    paths.splice(idx, 1);
-    if (!paths.length) delete load.paths;
+  const remainingPaths = paths.filter((path) => path !== pluginRoot);
+  if (remainingPaths.length !== paths.length) {
+    if (remainingPaths.length) load.paths = remainingPaths;
+    else delete load.paths;
     if (!Object.keys(load).length) delete plugins.load;
     messages.push("removed plugins.load.paths entry (caused duplicate registration)");
   }
